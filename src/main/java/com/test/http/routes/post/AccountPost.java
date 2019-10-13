@@ -17,11 +17,13 @@ public final class AccountPost implements Route {
 
     @Override
     public Object handle(final Request request, final Response response) throws Exception {
-        final Account created = new Gson().fromJson(
-            request.body(),
-            Account.class
+        this.insert.exec(
+            new Gson()
+                .fromJson(
+                    request.body(),
+                    Account.class
+                )
         );
-        this.insert.exec(created);
         response.status(200);
         response.type("application/json");
         return response;

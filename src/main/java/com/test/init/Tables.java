@@ -9,14 +9,14 @@ public class Tables {
     private static final List<String> TABLES = new ListOf<>(
         "CREATE TABLE IF NOT EXISTS account(\n" +
             "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
-            "    name text,\n" +
-            "    balance float\n" +
+            "    name TEXT,\n" +
+            "    balance DOUBLE\n" +
             ")",
         "CREATE TABLE IF NOT EXISTS operation(\n" +
             "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
             "    from_acc account,\n" +
             "    to_acc account,\n" +
-            "    amount FLOAT\n" +
+            "    amount DOUBLE\n" +
             ")"
     );
 

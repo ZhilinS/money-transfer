@@ -56,12 +56,15 @@ public class TransferTesting {
     @Test
     @Order(1)
     public void testPostAccount() throws IOException {
-        final TextOf text = new TextOf(
-            new ResourceOf(
-                Paths.get("accounts.json").toString()
+        new Gson()
+            .fromJson(
+                new TextOf(
+                    new ResourceOf(
+                        Paths.get("accounts.json").toString()
+                    )
+                ).asString(),
+                List.class
             )
-        );
-        new Gson().fromJson(text.asString(), List.class)
             .forEach(
                 acc -> given()
                     .body(new Gson().toJson(acc))

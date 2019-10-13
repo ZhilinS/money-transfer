@@ -1,51 +1,30 @@
 package com.test.http;
 
-import com.google.gson.Gson;
-import com.test.model.Account;
-import com.test.query.AccountInsert;
-import com.test.query.AccountSingle;
+import com.test.http.routes.get.AccountGet;
+import com.test.http.routes.post.AccountPost;
 import lombok.extern.slf4j.Slf4j;
 import static spark.Spark.*;
 
 @Slf4j
 public final class Router {
 
-    static {
-        port(8080);
-    }
+    private final AccountGet accountGet;
+    private final AccountPost accountPost;
 
-    private final AccountSingle account;
-    private final AccountInsert insert;
-
-    public Router(final AccountSingle account, final AccountInsert insert) {
-        this.account = account;
-        this.insert = insert;
+    public Router(
+        final AccountGet accountGet,
+        final AccountPost accountPost
+    ) {
+        this.accountGet = accountGet;
+        this.accountPost = accountPost;
     }
 
     public void init() {
+        port(8080);
         path("/api", () -> {
             path("/account", () -> {
-                get(
-                    "/:id",
-                    (req, res) -> new Gson().toJson(
-                        this.account.apply(
-                            Integer.valueOf(req.params(":id"))
-                        )
-                    )
-                );
-                post(
-                    "",
-                    (req, res) -> {
-                        final Account created = new Gson().fromJson(
-                            req.body(),
-                            Account.class
-                        );
-                        this.insert.exec(created);
-                        res.status(200);
-                        res.type("application/json");
-                        return res;
-                    }
-                );
+                get("/:id", this.accountGet);
+                post("", this.accountPost);
             });
         });
     }

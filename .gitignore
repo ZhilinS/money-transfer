@@ -1,3 +1,5 @@
 memory:one
+memory:test
 *.iml
 target
+.idea

@@ -5,7 +5,7 @@ import com.test.model.Operation;
 import java.util.Collection;
 import java.util.List;
 
-public class OperationsOf {
+public final class OperationsOf {
 
     private final Session session;
     private final Collection<Integer> accounts;

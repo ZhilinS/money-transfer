@@ -8,19 +8,22 @@ import static spark.Spark.*;
 @Slf4j
 public final class Router {
 
+    private final int port;
     private final AccountGet accountGet;
     private final AccountPost accountPost;
 
     public Router(
+        final int port,
         final AccountGet accountGet,
         final AccountPost accountPost
     ) {
+        this.port = port;
         this.accountGet = accountGet;
         this.accountPost = accountPost;
     }
 
     public void init() {
-        port(8080);
+        port(this.port);
         path("/api", () -> {
             path("/account", () -> {
                 get("/:id", this.accountGet);

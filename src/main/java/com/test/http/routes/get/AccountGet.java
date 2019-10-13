@@ -1,6 +1,3 @@
-/*
- * Copyright (C) 2018, SEMRUSH CY LTD or it's affiliates
- */
 package com.test.http.routes.get;
 
 import com.google.gson.Gson;
@@ -19,6 +16,7 @@ public final class AccountGet implements Route {
 
     @Override
     public Object handle(final Request request, final Response response) throws Exception {
+        response.type("application/json");
         return new Gson().toJson(
             this.account.apply(
                 Integer.valueOf(request.params(":id"))

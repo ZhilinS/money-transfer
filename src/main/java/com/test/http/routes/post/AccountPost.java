@@ -1,6 +1,3 @@
-/*
- * Copyright (C) 2018, SEMRUSH CY LTD or it's affiliates
- */
 package com.test.http.routes.post;
 
 import com.google.gson.Gson;

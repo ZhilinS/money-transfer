@@ -20,6 +20,11 @@ public class Tables {
             ")"
     );
 
+    private static final List<String> CLEAN = new ListOf<>(
+        "DROP TABLE IF EXISTS account",
+        "DROP TABLE IF EXISTS operation"
+    );
+
     private final Session session;
 
     public Tables(final Session session) {
@@ -28,6 +33,12 @@ public class Tables {
 
     public void init() {
         Tables.TABLES.forEach(
+            sql -> this.session.execute(ctx -> ctx.execute(sql))
+        );
+    }
+
+    public void clean() {
+        Tables.CLEAN.forEach(
             sql -> this.session.execute(ctx -> ctx.execute(sql))
         );
     }

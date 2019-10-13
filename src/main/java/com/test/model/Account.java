@@ -10,6 +10,13 @@ public class Account {
     private final float balance;
 
     public Account(
+        final String name,
+        final float balance
+    ) {
+        this(0, name, balance);
+    }
+
+    public Account(
         final int id,
         final String name,
         final float balance

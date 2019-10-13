@@ -7,7 +7,7 @@ import com.test.db.Connect;
 import com.test.db.Session;
 import com.test.init.Tables;
 import com.test.model.Account;
-import com.test.query.AccountSingle;
+import com.test.query.AccountInsert;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -17,7 +17,5 @@ public class Application {
         final Connect connect = new Connect("jdbc:sqlite:memory:one");
         final Session session = connect.session();
         new Tables(session).init();
-        final Account acc = new AccountSingle(session, 1).value();
-        System.out.println(acc);
     }
 }

@@ -24,10 +24,10 @@ public final class AccountSingle implements Scalar<Account> {
     public Account value() {
         return this.session.retrieve(
             ctx -> ctx.selectFrom("account")
-            .where(
-                String.format("id = %d", this.id)
-            )
-            .fetchOneInto(Account.class)
+                .where(
+                    String.format("id = %d", this.id)
+                )
+                .fetchOneInto(Account.class)
         );
     }
 }

@@ -4,11 +4,10 @@ import com.google.gson.Gson;
 import com.test.db.Connect;
 import com.test.db.Session;
 import com.test.http.Router;
-import com.test.http.routes.get.AccountGet;
-import com.test.http.routes.post.AccountPost;
-import com.test.init.Tables;
+import com.test.http.routes.Accounts;
 import com.test.query.AccountInsert;
 import com.test.query.AccountSingle;
+import com.test.query.OperationInsert;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
@@ -31,24 +30,19 @@ public class TransferTesting {
 
     private final static int PORT = 8081;
 
-    private Tables tables;
+    private Connect connect;
 
     @BeforeAll
     public void setup() {
-        final Session session = new Connect("jdbc:sqlite:memory:test").session();
-        tables = new Tables(session);
-        tables.init();
+        connect = new Connect("jdbc:sqlite:memory:test");
+        connect.init();
+        final Session session = connect.session();
         new Router(
             TransferTesting.PORT,
-            new AccountGet(
-                new AccountSingle(
-                    session
-                )
-            ),
-            new AccountPost(
-                new AccountInsert(
-                    session
-                )
+            new Accounts(
+                new AccountSingle(session),
+                new AccountInsert(session),
+                new OperationInsert(session)
             )
         ).init();
     }
@@ -90,8 +84,70 @@ public class TransferTesting {
             .statusCode(HttpStatus.SC_OK);
     }
 
+    //    @Test
+    @Order(3)
+    public void testWithdraw() {
+        given()
+            .body("{\"amount\": 12.3}")
+            .when()
+            .port(TransferTesting.PORT)
+            .post("/api/account/withdraw/3");
+        given()
+            .when()
+            .port(TransferTesting.PORT)
+            .get("/api/account/3")
+            .then()
+            .assertThat()
+            .body("balance", equalTo(87.7))
+            .statusCode(HttpStatus.SC_OK);
+    }
+
+    //    @Test
+    @Order(4)
+    public void testDeposit() {
+        given()
+            .body("{\"amount\": 12.3}")
+            .when()
+            .port(TransferTesting.PORT)
+            .post("/api/account/deposit/3");
+        given()
+            .when()
+            .port(TransferTesting.PORT)
+            .get("/api/account/3")
+            .then()
+            .assertThat()
+            .body("balance", equalTo(100.0))
+            .statusCode(HttpStatus.SC_OK);
+    }
+
+    @Test
+    @Order(5)
+    public void testTransfer() {
+        given()
+            .body("{\"from\": 3, \"to\": 2, \"amount\": 12.3}")
+            .when()
+            .port(TransferTesting.PORT)
+            .post("/api/transfer");
+        given()
+            .when()
+            .port(TransferTesting.PORT)
+            .get("/api/account/3")
+            .then()
+            .assertThat()
+            .body("balance", equalTo(87.7))
+            .statusCode(HttpStatus.SC_OK);
+        given()
+            .when()
+            .port(TransferTesting.PORT)
+            .get("/api/account/2")
+            .then()
+            .assertThat()
+            .body("balance", equalTo(24.6))
+            .statusCode(HttpStatus.SC_OK);
+    }
+
     @AfterAll
     public void clean() {
-        tables.clean();
+        connect.clean();
     }
 }

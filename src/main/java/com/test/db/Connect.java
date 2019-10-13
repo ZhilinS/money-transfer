@@ -2,6 +2,7 @@ package com.test.db;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.flywaydb.core.Flyway;
 import org.sqlite.SQLiteDataSource;
 
 public final class Connect {
@@ -16,6 +17,13 @@ public final class Connect {
         this.url = url;
     }
 
+    public void init() {
+        Flyway.configure()
+            .dataSource(this.url, "", "")
+            .load()
+            .migrate();
+    }
+
     public Session session() {
         if (Connect.SESSIONS.isEmpty()) {
             final SQLiteDataSource source = new SQLiteDataSource();
@@ -26,5 +34,12 @@ public final class Connect {
         } else {
             return Connect.SESSIONS.get(0);
         }
+    }
+
+    public void clean() {
+        Flyway.configure()
+            .dataSource(this.url, "", "")
+            .load()
+            .clean();
     }
 }

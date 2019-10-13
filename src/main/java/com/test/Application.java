@@ -3,11 +3,10 @@ package com.test;
 import com.test.db.Connect;
 import com.test.db.Session;
 import com.test.http.Router;
-import com.test.http.routes.get.AccountGet;
-import com.test.http.routes.post.AccountPost;
-import com.test.init.Tables;
+import com.test.http.routes.Accounts;
 import com.test.query.AccountInsert;
 import com.test.query.AccountSingle;
+import com.test.query.OperationInsert;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -15,19 +14,14 @@ public class Application {
 
     public static void main(String[] args) {
         final Connect connect = new Connect("jdbc:sqlite:memory:one");
+        connect.init();
         final Session session = connect.session();
-        new Tables(session).init();
         new Router(
             8080,
-            new AccountGet(
-                new AccountSingle(
-                    session
-                )
-            ),
-            new AccountPost(
-                new AccountInsert(
-                    session
-                )
+            new Accounts(
+                new AccountSingle(session),
+                new AccountInsert(session),
+                new OperationInsert(session)
             )
         ).init();
     }

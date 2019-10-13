@@ -2,27 +2,22 @@ package com.test.query;
 
 import com.test.db.Session;
 import com.test.model.Account;
-import org.cactoos.Scalar;
+import org.cactoos.Func;
 
-public final class AccountSingle implements Scalar<Account> {
+public final class AccountSingle implements Func<Integer, Account> {
 
     private final Session session;
-    private final int id;
 
-    public AccountSingle(
-        final Session session,
-        final int id
-    ) {
+    public AccountSingle(final Session session) {
         this.session = session;
-        this.id = id;
     }
 
     @Override
-    public Account value() {
+    public Account apply(final Integer id) throws Exception {
         return this.session.retrieve(
             ctx -> ctx.selectFrom("account")
                 .where(
-                    String.format("id = %d", this.id)
+                    String.format("id = %d", id)
                 )
                 .fetchOneInto(Account.class)
         );

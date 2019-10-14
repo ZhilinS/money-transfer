@@ -1,33 +1,33 @@
 package com.test.http.routes;
 
 import com.google.gson.Gson;
-import com.test.job.Reactor;
-import com.test.job.TransactionJob;
 import com.test.http.OperationRes;
 import com.test.http.req.OperationReq;
+import com.test.job.Reactor;
+import com.test.job.TransactionJob;
 import com.test.model.Account;
 import com.test.model.Operation;
 import com.test.query.AccountInsert;
 import com.test.query.AccountSingle;
-import com.test.query.OperationInsert;
+import com.test.query.AccountUpdate;
 import spark.Route;
 
 public final class Accounts {
 
     private final AccountSingle account;
     private final AccountInsert insert;
-    private final OperationInsert transaction;
+    private final AccountUpdate update;
     private final Reactor reactor;
 
     public Accounts(
         final AccountSingle account,
         final AccountInsert insert,
-        final OperationInsert transaction,
+        final AccountUpdate update,
         final Reactor reactor
     ) {
         this.account = account;
         this.insert = insert;
-        this.transaction = transaction;
+        this.update = update;
         this.reactor = reactor;
     }
 
@@ -64,27 +64,14 @@ public final class Accounts {
                     request.body(),
                     OperationReq.class
                 );
-            final Account from = this.account.apply(
-                req.from()
-            );
-            final Account to = this.account.apply(
-                req.to()
-            );
-            final int operationId = this.transaction.exec(
-                from,
-                to,
-                req.amount(),
-                Operation.Status.PENDING
-            );
-            this.reactor.exec(
-                operationId,
+            this.reactor.process(
+                req,
                 new TransactionJob(
-                    from,
-                    to,
-                    req.amount()
+                    this.update,
+                    this.account,
+                    req
                 )
             );
-            //todo: Error handling
             return new Gson().toJson(
                 new OperationRes(
                     req.from(),

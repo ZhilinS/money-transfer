@@ -14,7 +14,7 @@ public final class OperationUpdate implements BiProc<Operation.Status, Integer> 
     }
 
     @Override
-    public void exec(final Operation.Status status, final Integer id) throws Exception {
+    public void exec(final Operation.Status status, final Integer id) {
         this.session.execute(
             ctx -> ctx.update(
                 DSL.table(DSL.name("operation"))

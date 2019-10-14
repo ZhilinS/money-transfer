@@ -45,10 +45,10 @@ public class TransferTesting {
             new Accounts(
                 new AccountSingle(session),
                 new AccountInsert(session),
-                new OperationInsert(session),
+                new AccountUpdate(session),
                 new Reactor(
                     new OperationUpdate(session),
-                    new AccountUpdate(session)
+                    new OperationInsert(session)
                 )
             )
         ).init();

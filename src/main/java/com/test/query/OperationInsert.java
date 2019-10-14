@@ -15,8 +15,8 @@ public final class OperationInsert {
     }
 
     public Integer exec(
-        final Account from,
-        final Account to,
+        final int from,
+        final int to,
         final double amount,
         final Operation.Status status
     ) {
@@ -34,8 +34,8 @@ public final class OperationInsert {
                             DSL.field(DSL.name("status"))
                         )
                         .values(
-                            from.id(),
-                            to.id(),
+                            from,
+                            to,
                             amount,
                             status
                         )
@@ -50,22 +50,6 @@ public final class OperationInsert {
                         .fetchOneInto(Integer.class);
                 }
             )
-//                ctx.insertInto(
-//                DSL.table(DSL.name("operation"))
-//            )
-//                .columns(
-//                    DSL.field(DSL.name("from_acc")),
-//                    DSL.field(DSL.name("to_acc")),
-//                    DSL.field(DSL.name("amount")),
-//                    DSL.field(DSL.name("status"))
-//                )
-//                .values(
-//                    from.id(),
-//                    to.id(),
-//                    amount,
-//                    status
-//                )
-//                .execute()
         );
     }
 }

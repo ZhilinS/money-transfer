@@ -1,6 +1,8 @@
 package com.test.http.routes;
 
 import com.google.gson.Gson;
+import com.test.job.Reactor;
+import com.test.job.TransactionJob;
 import com.test.http.OperationRes;
 import com.test.http.req.OperationReq;
 import com.test.model.Account;
@@ -8,6 +10,7 @@ import com.test.model.Operation;
 import com.test.query.AccountInsert;
 import com.test.query.AccountSingle;
 import com.test.query.OperationInsert;
+import com.test.query.TransactionHash;
 import spark.Route;
 
 public final class Accounts {
@@ -15,16 +18,18 @@ public final class Accounts {
     private final AccountSingle account;
     private final AccountInsert insert;
     private final OperationInsert transaction;
-//    private final Reactor reactor;
+    private final Reactor reactor;
 
     public Accounts(
         final AccountSingle account,
         final AccountInsert insert,
-        final OperationInsert transaction
+        final OperationInsert transaction,
+        final Reactor reactor
     ) {
         this.account = account;
         this.insert = insert;
         this.transaction = transaction;
+        this.reactor = reactor;
     }
 
     public Route get() {
@@ -66,19 +71,20 @@ public final class Accounts {
             final Account to = this.account.apply(
                 req.to()
             );
-            this.transaction.exec(
+            final int operationId = this.transaction.exec(
                 from,
                 to,
                 req.amount(),
                 Operation.Status.PENDING
             );
-//            this.reactor.exec(
-//                new TransactionJob(
-//                    from,
-//                    to,
-//                    req.amount()
-//                )
-//            );
+            this.reactor.exec(
+                operationId,
+                new TransactionJob(
+                    from,
+                    to,
+                    req.amount()
+                )
+            );
             //todo: Error handling
             return new Gson().toJson(
                 new OperationRes(

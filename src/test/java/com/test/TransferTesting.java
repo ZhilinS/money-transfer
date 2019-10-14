@@ -5,9 +5,12 @@ import com.test.db.Connect;
 import com.test.db.Session;
 import com.test.http.Router;
 import com.test.http.routes.Accounts;
+import com.test.job.Reactor;
 import com.test.query.AccountInsert;
 import com.test.query.AccountSingle;
+import com.test.query.AccountUpdate;
 import com.test.query.OperationInsert;
+import com.test.query.OperationUpdate;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
@@ -42,7 +45,11 @@ public class TransferTesting {
             new Accounts(
                 new AccountSingle(session),
                 new AccountInsert(session),
-                new OperationInsert(session)
+                new OperationInsert(session),
+                new Reactor(
+                    new OperationUpdate(session),
+                    new AccountUpdate(session)
+                )
             )
         ).init();
     }
@@ -81,6 +88,7 @@ public class TransferTesting {
             .then()
             .assertThat()
             .body("name", equalTo("Imogen Wickens"))
+            .body("balance", equalTo(0.0f))
             .statusCode(HttpStatus.SC_OK);
     }
 
@@ -134,7 +142,7 @@ public class TransferTesting {
             .get("/api/account/3")
             .then()
             .assertThat()
-            .body("balance", equalTo(87.7))
+            .body("balance", equalTo(87.7f))
             .statusCode(HttpStatus.SC_OK);
         given()
             .when()
@@ -142,7 +150,7 @@ public class TransferTesting {
             .get("/api/account/2")
             .then()
             .assertThat()
-            .body("balance", equalTo(24.6))
+            .body("balance", equalTo(24.6f))
             .statusCode(HttpStatus.SC_OK);
     }
 

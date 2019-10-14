@@ -22,6 +22,18 @@ public class Operation {
         this.status = status;
     }
 
+    public int id() {
+        return this.id;
+    }
+
+    public double amount() {
+        return this.amount;
+    }
+
+    public Status status() {
+        return this.status;
+    }
+
     public enum Status {
         PENDING,
         ERROR,

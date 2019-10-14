@@ -10,7 +10,6 @@ import com.test.model.Operation;
 import com.test.query.AccountInsert;
 import com.test.query.AccountSingle;
 import com.test.query.OperationInsert;
-import com.test.query.TransactionHash;
 import spark.Route;
 
 public final class Accounts {

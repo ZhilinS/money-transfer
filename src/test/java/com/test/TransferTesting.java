@@ -13,7 +13,15 @@ import com.test.query.OperationInsert;
 import com.test.query.OperationUpdate;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.cactoos.io.ResourceOf;
 import org.cactoos.text.TextOf;
@@ -27,6 +35,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
+@Slf4j
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TransferTesting {
@@ -130,19 +139,46 @@ public class TransferTesting {
 
     @Test
     @Order(5)
-    public void testTransfer() {
-        given()
-            .body("{\"from\": 3, \"to\": 2, \"amount\": 12.3}")
-            .when()
-            .port(TransferTesting.PORT)
-            .post("/api/transfer");
+    public void testTransfer() throws InterruptedException, ExecutionException {
+        final ExecutorService pool = Executors.newFixedThreadPool(20);
+        final List<Runnable> tasks = new ArrayList<>(20);
+        IntStream.rangeClosed(0, 9)
+            .boxed()
+            .forEach(i -> tasks.add(
+                new Thread(
+                    () -> given()
+                        .body("{\"from\": 3, \"to\": 2, \"amount\": 100}")
+                        .when()
+                        .port(TransferTesting.PORT)
+                        .post("/api/transfer"),
+                    String.format("MONEY-3-2-THREAD-%d", i)
+                )
+            ));
+        IntStream.rangeClosed(10, 19)
+            .boxed()
+            .forEach(i -> tasks.add(
+                new Thread(
+                    () -> given()
+                        .body("{\"from\": 2, \"to\": 3, \"amount\": 100}")
+                        .when()
+                        .port(TransferTesting.PORT)
+                        .post("/api/transfer"),
+                    String.format("MONEY-2-3-THREAD-%d", i)
+                )
+            ));
+        final List<? extends Future<?>> futures = tasks.stream().map(pool::submit).collect(Collectors.toList());
+        log.info("Future size: {}", futures.size());
+        for (Future future:futures) {
+            future.get();
+            log.info("Finished one future");
+        }
         given()
             .when()
             .port(TransferTesting.PORT)
             .get("/api/account/3")
             .then()
             .assertThat()
-            .body("balance", equalTo(87.7f))
+            .body("balance", equalTo(100.0f))
             .statusCode(HttpStatus.SC_OK);
         given()
             .when()
@@ -150,7 +186,7 @@ public class TransferTesting {
             .get("/api/account/2")
             .then()
             .assertThat()
-            .body("balance", equalTo(24.6f))
+            .body("balance", equalTo(12.3f))
             .statusCode(HttpStatus.SC_OK);
     }
 

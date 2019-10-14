@@ -57,6 +57,12 @@ public final class Accounts {
         };
     }
 
+//    public Route withdraw() {
+//        return (request, response) -> {
+//
+//        };
+//    }
+
     public Route transfer() {
         return (request, response) -> {
             final OperationReq req = new Gson()

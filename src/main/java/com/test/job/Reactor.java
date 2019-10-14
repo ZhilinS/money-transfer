@@ -6,10 +6,12 @@ import com.test.model.Operation;
 import com.test.query.OperationInsert;
 import com.test.query.OperationUpdate;
 import java.util.concurrent.locks.Lock;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public final class Reactor {
 
-    private final Striped<Lock> locks = Striped.lazyWeakLock(10);
+    private final static Striped<Lock> LOCKS = Striped.lazyWeakLock(10);
 
     private final OperationUpdate operation;
     private final OperationInsert transaction;
@@ -26,10 +28,17 @@ public final class Reactor {
         final OperationReq req,
         final TransactionJob job
     ) {
-        final Lock fromLock = locks.get(req.from());
-        final Lock toLock = locks.get(req.to());
-        fromLock.lock();
-        toLock.lock();
+        final Lock firstLock;
+        final Lock secondLock;
+        if (req.from() < req.to()) {
+            firstLock = Reactor.LOCKS.get(req.from());
+            secondLock = Reactor.LOCKS.get(req.to());
+        } else {
+            firstLock = Reactor.LOCKS.get(req.to());
+            secondLock = Reactor.LOCKS.get(req.from());
+        }
+        firstLock.lock();
+        secondLock.lock();
         try {
             job.exchange(
                 () -> this.transaction.exec(
@@ -47,9 +56,11 @@ public final class Reactor {
                     id
                 )
             );
+            log.info("JOB FINISHED");
         } finally {
-            fromLock.unlock();
-            toLock.unlock();
+            firstLock.unlock();
+            secondLock.unlock();
+            log.info("UNLOCKED: {}", Thread.currentThread().getId());
         }
     }
 }

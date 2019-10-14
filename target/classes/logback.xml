@@ -9,7 +9,7 @@
         <appender-ref ref="CONSOLE"/>
     </root>
 
-    <logger name="org.jooq" level="DEBUG">
+    <logger name="org.jooq" level="INFO">
         <appender-ref ref="CONSOLE"/>
     </logger>
 

@@ -1,4 +1,4 @@
-package com.test.query;
+package com.test.query.account;
 
 import com.test.db.Session;
 import com.test.model.Account;

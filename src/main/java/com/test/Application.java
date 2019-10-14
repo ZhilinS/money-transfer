@@ -5,10 +5,10 @@ import com.test.db.Session;
 import com.test.http.Router;
 import com.test.http.routes.Accounts;
 import com.test.job.Reactor;
-import com.test.query.AccountInsert;
-import com.test.query.AccountSingle;
-import com.test.query.AccountUpdate;
-import com.test.query.OperationInsert;
+import com.test.query.account.AccountInsert;
+import com.test.query.account.AccountSingle;
+import com.test.query.account.AccountUpdate;
+import com.test.query.Transfer;
 import com.test.query.OperationUpdate;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,7 +27,7 @@ public class Application {
                 new AccountUpdate(session),
                 new Reactor(
                     new OperationUpdate(session),
-                    new OperationInsert(session)
+                    new Transfer(session)
                 )
             )
         ).init();

@@ -1,8 +1,9 @@
-package com.test.query;
+package com.test.query.account;
 
 import com.test.db.Session;
 import com.test.model.Account;
 import org.cactoos.Func;
+import org.jooq.impl.DSL;
 
 public final class AccountSingle implements Func<Integer, Account> {
 
@@ -17,7 +18,7 @@ public final class AccountSingle implements Func<Integer, Account> {
         return this.session.retrieve(
             ctx -> ctx.selectFrom("account")
                 .where(
-                    String.format("id = %d", id)
+                    DSL.field(DSL.name("id")).eq(id)
                 )
                 .fetchOneInto(Account.class)
         );

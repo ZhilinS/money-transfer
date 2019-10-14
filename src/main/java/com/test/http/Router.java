@@ -1,8 +1,6 @@
 package com.test.http;
 
 import com.test.http.routes.Accounts;
-import com.test.http.routes.get.AccountGet;
-import com.test.http.routes.post.AccountPost;
 import lombok.extern.slf4j.Slf4j;
 import static spark.Spark.*;
 
@@ -24,8 +22,8 @@ public final class Router {
         port(this.port);
         path("/api", () -> {
             path("/account", () -> {
-                get("/:id", this.accounts.get());
-                post("", this.accounts.post());
+                get("/:id", this.accounts.single());
+                post("", this.accounts.insert());
 //                post("/withdraw/:id", this.accounts.withdraw());
 //                post("/deposit/:id", this.accounts.deposit());
             });

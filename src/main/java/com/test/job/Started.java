@@ -1,6 +1,6 @@
 package com.test.job;
 
 @FunctionalInterface
-public interface GetId {
+public interface Started {
     int get();
 }

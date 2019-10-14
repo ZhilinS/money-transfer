@@ -1,24 +1,21 @@
 package com.test.query;
 
 import com.test.db.Session;
-import com.test.model.Account;
+import com.test.http.req.OperationReq;
 import com.test.model.Operation;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
-public final class OperationInsert {
+public final class Transfer {
 
     private final Session session;
 
-    public OperationInsert(final Session session) {
+    public Transfer(final Session session) {
         this.session = session;
     }
 
-    public Integer exec(
-        final int from,
-        final int to,
-        final double amount,
-        final Operation.Status status
+    public Integer created(
+        final OperationReq req
     ) {
         return this.session.retrieve(
             ctx -> ctx.transactionResult(
@@ -34,10 +31,10 @@ public final class OperationInsert {
                             DSL.field(DSL.name("status"))
                         )
                         .values(
-                            from,
-                            to,
-                            amount,
-                            status
+                            req.from(),
+                            req.to(),
+                            req.amount(),
+                            Operation.Status.PENDING
                         )
                         .execute();
                     return DSL.using(configuration)

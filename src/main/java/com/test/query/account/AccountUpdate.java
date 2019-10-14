@@ -1,4 +1,4 @@
-package com.test.query;
+package com.test.query.account;
 
 import com.test.db.Session;
 import com.test.model.Account;
@@ -24,8 +24,7 @@ public final class AccountUpdate implements Proc<Account> {
                 input.balance()
             )
             .where(
-                DSL.field(DSL.name("id"))
-                    .eq(input.id())
+                DSL.field(DSL.name("id")).eq(input.id())
             )
             .execute()
         );

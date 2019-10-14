@@ -2,8 +2,8 @@ package com.test.job;
 
 import com.test.http.req.OperationReq;
 import com.test.model.Account;
-import com.test.query.AccountSingle;
-import com.test.query.AccountUpdate;
+import com.test.query.account.AccountSingle;
+import com.test.query.account.AccountUpdate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -23,12 +23,12 @@ public final class TransactionJob {
         this.req = req;
     }
 
-    public void exchange(
-        final GetId insert,
-        final TransId completed,
-        final TransId error
+    public void start(
+        final Started started,
+        final Updated completed,
+        final Updated error
     ) {
-        final int operation = insert.get();
+        final int transaction = started.get();
         try {
             final Account from = this.accounts.apply(
                 req.from()
@@ -50,10 +50,10 @@ public final class TransactionJob {
                     to.balance() + this.req.amount()
                 )
             );
-            completed.exec(operation);
+            completed.set(transaction);
         } catch (final Exception exception) {
             log.error("Exception while processing transaction");
-            error.exec(operation);
+            error.set(transaction);
         }
     }
 }

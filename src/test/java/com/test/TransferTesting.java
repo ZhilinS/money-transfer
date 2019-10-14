@@ -6,14 +6,15 @@ import com.test.db.Session;
 import com.test.http.Router;
 import com.test.http.routes.Accounts;
 import com.test.job.Reactor;
-import com.test.query.AccountInsert;
-import com.test.query.AccountSingle;
-import com.test.query.AccountUpdate;
-import com.test.query.OperationInsert;
+import com.test.query.account.AccountInsert;
+import com.test.query.account.AccountSingle;
+import com.test.query.account.AccountUpdate;
+import com.test.query.Transfer;
 import com.test.query.OperationUpdate;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -57,7 +58,7 @@ public class TransferTesting {
                 new AccountUpdate(session),
                 new Reactor(
                     new OperationUpdate(session),
-                    new OperationInsert(session)
+                    new Transfer(session)
                 )
             )
         ).init();
@@ -140,37 +141,38 @@ public class TransferTesting {
     @Test
     @Order(5)
     public void testTransfer() throws InterruptedException, ExecutionException {
-        final ExecutorService pool = Executors.newFixedThreadPool(20);
-        final List<Runnable> tasks = new ArrayList<>(20);
-        IntStream.rangeClosed(0, 9)
+        final ExecutorService pool = Executors.newFixedThreadPool(10);
+        final List<Runnable> tasks = new ArrayList<>(200);
+        IntStream.rangeClosed(0, 99)
             .boxed()
             .forEach(i -> tasks.add(
                 new Thread(
                     () -> given()
-                        .body("{\"from\": 3, \"to\": 2, \"amount\": 100}")
+                        .body("{\"from\": 3, \"to\": 2, \"amount\": 1}")
                         .when()
                         .port(TransferTesting.PORT)
                         .post("/api/transfer"),
                     String.format("MONEY-3-2-THREAD-%d", i)
                 )
             ));
-        IntStream.rangeClosed(10, 19)
+        IntStream.rangeClosed(100, 199)
             .boxed()
             .forEach(i -> tasks.add(
                 new Thread(
                     () -> given()
-                        .body("{\"from\": 2, \"to\": 3, \"amount\": 100}")
+                        .body("{\"from\": 2, \"to\": 3, \"amount\": 1}")
                         .when()
                         .port(TransferTesting.PORT)
                         .post("/api/transfer"),
                     String.format("MONEY-2-3-THREAD-%d", i)
                 )
             ));
-        final List<? extends Future<?>> futures = tasks.stream().map(pool::submit).collect(Collectors.toList());
-        log.info("Future size: {}", futures.size());
+        Collections.shuffle(tasks);
+        final List<? extends Future<?>> futures = tasks.stream()
+            .map(pool::submit)
+            .collect(Collectors.toList());
         for (Future future:futures) {
             future.get();
-            log.info("Finished one future");
         }
         given()
             .when()
@@ -186,7 +188,7 @@ public class TransferTesting {
             .get("/api/account/2")
             .then()
             .assertThat()
-            .body("balance", equalTo(12.3f))
+            .body("balance", equalTo(112.3f))
             .statusCode(HttpStatus.SC_OK);
     }
 

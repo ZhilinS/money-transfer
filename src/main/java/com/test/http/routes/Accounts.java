@@ -7,9 +7,9 @@ import com.test.job.Reactor;
 import com.test.job.TransactionJob;
 import com.test.model.Account;
 import com.test.model.Operation;
-import com.test.query.AccountInsert;
-import com.test.query.AccountSingle;
-import com.test.query.AccountUpdate;
+import com.test.query.account.AccountInsert;
+import com.test.query.account.AccountSingle;
+import com.test.query.account.AccountUpdate;
 import spark.Route;
 
 public final class Accounts {
@@ -31,7 +31,7 @@ public final class Accounts {
         this.reactor = reactor;
     }
 
-    public Route get() {
+    public Route single() {
         return (request, response) -> {
             response.type("application/json");
             return new Gson().toJson(
@@ -42,8 +42,9 @@ public final class Accounts {
         };
     }
 
-    public Route post() {
+    public Route insert() {
         return (request, response) -> {
+            response.type("application/json");
             this.insert.exec(
                 new Gson()
                     .fromJson(
@@ -51,17 +52,9 @@ public final class Accounts {
                         Account.class
                     )
             );
-            response.status(200);
-            response.type("application/json");
             return response;
         };
     }
-
-//    public Route withdraw() {
-//        return (request, response) -> {
-//
-//        };
-//    }
 
     public Route transfer() {
         return (request, response) -> {

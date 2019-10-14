@@ -1,7 +1,7 @@
 package com.test.http.routes.get;
 
 import com.google.gson.Gson;
-import com.test.query.AccountSingle;
+import com.test.query.account.AccountSingle;
 import spark.Request;
 import spark.Response;
 import spark.Route;

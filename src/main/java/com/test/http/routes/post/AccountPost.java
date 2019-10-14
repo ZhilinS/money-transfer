@@ -2,7 +2,7 @@ package com.test.http.routes.post;
 
 import com.google.gson.Gson;
 import com.test.model.Account;
-import com.test.query.AccountInsert;
+import com.test.query.account.AccountInsert;
 import spark.Request;
 import spark.Response;
 import spark.Route;

@@ -15,6 +15,7 @@ import com.test.job.Reactor;
 import com.test.query.account.AccountCreate;
 import com.test.query.account.AccountOf;
 import com.test.query.account.AccountUpdate;
+import com.test.query.account.AccountsOf;
 import com.test.query.transfer.TransferCreate;
 import com.test.query.transfer.TransferOf;
 import com.test.query.transfer.TransferUpdate;
@@ -63,6 +64,7 @@ public class TransferTesting {
             TransferTesting.PORT,
             new Accounts(
                 new AccountOf(session),
+                new AccountsOf(session),
                 new AccountUpdate(session),
                 new AccountCreate(session),
                 new Reactor(
@@ -107,6 +109,19 @@ public class TransferTesting {
     @AfterEach
     public void clean() {
         connect.clean();
+    }
+
+    @Test
+    @Order(1)
+    public void testGetAccountsList() {
+        given()
+            .when()
+            .port(TransferTesting.PORT)
+            .get("/api/account")
+            .then()
+            .assertThat()
+            .body("size()", equalTo(10))
+            .statusCode(HttpStatus.SC_OK);
     }
 
     @Test

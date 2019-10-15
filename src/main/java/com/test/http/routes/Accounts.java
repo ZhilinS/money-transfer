@@ -12,23 +12,27 @@ import com.test.model.Account;
 import com.test.query.account.AccountCreate;
 import com.test.query.account.AccountOf;
 import com.test.query.account.AccountUpdate;
+import com.test.query.account.AccountsOf;
 import org.eclipse.jetty.http.HttpStatus;
 import spark.Route;
 
 public final class Accounts {
 
     private final AccountOf account;
+    private final AccountsOf accounts;
     private final AccountUpdate updated;
     private final AccountCreate create;
     private final Reactor reactor;
 
     public Accounts(
         final AccountOf account,
+        final AccountsOf accounts,
         final AccountUpdate updated,
         final AccountCreate create,
         final Reactor reactor
     ) {
         this.account = account;
+        this.accounts = accounts;
         this.updated = updated;
         this.create = create;
         this.reactor = reactor;
@@ -41,6 +45,15 @@ public final class Accounts {
                 this.account.apply(
                     Integer.valueOf(request.params(":id"))
                 )
+            );
+        };
+    }
+
+    public Route all() {
+        return (request, response) -> {
+            response.type("application/json");
+            return new Gson().toJson(
+                this.accounts.value()
             );
         };
     }

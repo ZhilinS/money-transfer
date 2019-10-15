@@ -8,6 +8,7 @@ import com.test.http.routes.Transfers;
 import com.test.job.Locker;
 import com.test.job.LockerWrap;
 import com.test.job.Reactor;
+import com.test.query.account.AccountsOf;
 import com.test.query.transfer.TransferOf;
 import com.test.query.transfer.TransferUpdate;
 import com.test.query.transfer.TransferCreate;
@@ -28,6 +29,7 @@ public class Application {
             8080,
             new Accounts(
                 new AccountOf(session),
+                new AccountsOf(session),
                 new AccountUpdate(session),
                 new AccountCreate(session),
                 new Reactor(

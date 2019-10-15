@@ -26,6 +26,7 @@ public final class Router {
         port(this.port);
         path("/api", () -> {
             path("/account", () -> {
+                get("", this.accounts.all());
                 get("/:id", this.accounts.single());
                 post("", this.accounts.insert());
                 post("/withdraw", this.accounts.withdraw());

@@ -1,10 +1,10 @@
 package com.test.job;
 
 import com.google.common.util.concurrent.Striped;
-import com.test.http.req.OperationReq;
-import com.test.model.Operation;
-import com.test.query.OperationUpdate;
-import com.test.query.Transfer;
+import com.test.http.req.ReqTransfer;
+import com.test.model.Transfer;
+import com.test.query.transfer.TransferUpdate;
+import com.test.query.transfer.TransferCreate;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import lombok.extern.slf4j.Slf4j;
@@ -16,40 +16,40 @@ public final class Reactor {
     private final static ConcurrentHashMap<Integer, Lock> REQUEST_LOCKS =
         new ConcurrentHashMap<>(10);
 
-    private final Transfer transfer;
-    private final OperationUpdate update;
+    private final TransferCreate transfer;
+    private final TransferUpdate update;
 
     public Reactor(
-        final Transfer transfer,
-        final OperationUpdate update
+        final TransferCreate transfer,
+        final TransferUpdate update
     ) {
         this.transfer = transfer;
         this.update = update;
     }
 
     public void process(
-        final OperationReq req,
+        final ReqTransfer req,
         final Job job
     ) {
-        final Integer transaction = this.transfer.created(req);
+        final Integer id = this.transfer.created(req);
         this.lock(req);
         try {
             job.start();
             this.update.exec(
-                Operation.Status.COMPLETED,
-                transaction
+                Transfer.Status.COMPLETED,
+                id
             );
         } catch (final Exception exception) {
             this.update.exec(
-                Operation.Status.ERROR,
-                transaction
+                Transfer.Status.ERROR,
+                id
             );
         } finally {
             this.unlock(req);
         }
     }
 
-    private void lock(OperationReq req) {
+    private void lock(ReqTransfer req) {
         if (req.from() < req.to()) {
             this.ordered(req.from(), req.to());
         } else {
@@ -66,7 +66,7 @@ public final class Reactor {
         second.lock();
     }
 
-    private void unlock(final OperationReq req) {
+    private void unlock(final ReqTransfer req) {
         Reactor.REQUEST_LOCKS.get(req.from()).unlock();
         Reactor.REQUEST_LOCKS.get(req.to()).unlock();
     }

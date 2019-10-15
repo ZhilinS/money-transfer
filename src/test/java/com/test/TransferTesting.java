@@ -6,10 +6,10 @@ import com.test.db.Session;
 import com.test.http.Router;
 import com.test.http.routes.Accounts;
 import com.test.job.Reactor;
-import com.test.query.OperationUpdate;
-import com.test.query.Transfer;
-import com.test.query.account.AccountInsert;
-import com.test.query.account.AccountSingle;
+import com.test.query.transfer.TransferUpdate;
+import com.test.query.transfer.TransferCreate;
+import com.test.query.account.AccountCreate;
+import com.test.query.account.AccountOf;
 import com.test.query.account.AccountUpdate;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -53,12 +53,12 @@ public class TransferTesting {
         new Router(
             TransferTesting.PORT,
             new Accounts(
-                new AccountSingle(session),
+                new AccountOf(session),
                 new AccountUpdate(session),
-                new AccountInsert(session),
+                new AccountCreate(session),
                 new Reactor(
-                    new Transfer(session),
-                    new OperationUpdate(session)
+                    new TransferCreate(session),
+                    new TransferUpdate(session)
                 )
             )
         ).init();
@@ -151,8 +151,7 @@ public class TransferTesting {
                         .body("{\"from\": 3, \"to\": 2, \"amount\": 1}")
                         .when()
                         .port(TransferTesting.PORT)
-                        .post("/api/transfer"),
-                    String.format("MONEY-3-2-THREAD-%d", i)
+                        .post("/api/transfer")
                 )
             ));
         IntStream.rangeClosed(100, 199)
@@ -163,8 +162,7 @@ public class TransferTesting {
                         .body("{\"from\": 2, \"to\": 3, \"amount\": 1}")
                         .when()
                         .port(TransferTesting.PORT)
-                        .post("/api/transfer"),
-                    String.format("MONEY-2-3-THREAD-%d", i)
+                        .post("/api/transfer")
                 )
             ));
         Collections.shuffle(tasks);

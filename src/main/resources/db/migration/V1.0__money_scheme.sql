@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS account
     name    TEXT,
     balance DOUBLE
 );
-CREATE TABLE operation
+CREATE TABLE transfer
 (
     id       INTEGER PRIMARY KEY AUTOINCREMENT,
     from_acc INTEGER,

@@ -1,6 +1,6 @@
 package com.test.model;
 
-public class Operation {
+public class Transfer {
 
     private final int id;
     private final Account fromAcc;
@@ -8,7 +8,7 @@ public class Operation {
     private final double amount;
     private final Status status;
 
-    public Operation(
+    public Transfer(
         final int id,
         final Account fromAcc,
         final Account toAcc,

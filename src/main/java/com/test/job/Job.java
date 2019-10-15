@@ -1,22 +1,22 @@
 package com.test.job;
 
-import com.test.http.req.OperationReq;
+import com.test.http.req.ReqTransfer;
 import com.test.model.Account;
-import com.test.query.account.AccountSingle;
+import com.test.query.account.AccountOf;
 import com.test.query.account.AccountUpdate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public final class Job {
 
-    private final OperationReq req;
+    private final ReqTransfer req;
     private final AccountUpdate update;
-    private final AccountSingle accounts;
+    private final AccountOf accounts;
 
     public Job(
-        final OperationReq req,
+        final ReqTransfer req,
         final AccountUpdate update,
-        final AccountSingle accounts
+        final AccountOf accounts
     ) {
         this.req = req;
         this.update = update;

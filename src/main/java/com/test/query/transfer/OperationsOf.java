@@ -1,7 +1,7 @@
-package com.test.query;
+package com.test.query.transfer;
 
 import com.test.db.Session;
-import com.test.model.Operation;
+import com.test.model.Transfer;
 import java.util.List;
 
 public final class OperationsOf {
@@ -12,11 +12,11 @@ public final class OperationsOf {
         this.session = session;
     }
 
-    public List<Operation> all() {
+    public List<Transfer> all() {
         return this.session.retrieve(
             ctx -> ctx.select()
-                .from("operation")
-                .fetchInto(Operation.class)
+                .from("transfer")
+                .fetchInto(Transfer.class)
         );
     }
 }

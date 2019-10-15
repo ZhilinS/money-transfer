@@ -1,12 +1,12 @@
 package com.test.http.req;
 
-public class OperationReq {
+public class ReqTransfer {
 
     private final int from;
     private final int to;
     private final double amount;
 
-    public OperationReq(
+    public ReqTransfer(
         final int from,
         final int to,
         final double amount

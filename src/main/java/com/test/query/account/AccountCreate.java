@@ -5,13 +5,11 @@ import com.test.model.Account;
 import org.cactoos.Proc;
 import org.jooq.impl.DSL;
 
-public final class AccountInsert implements Proc<Account> {
+public final class AccountCreate implements Proc<Account> {
 
     private final Session session;
 
-    public AccountInsert(
-        final Session session
-    ) {
+    public AccountCreate(final Session session) {
         this.session = session;
     }
 

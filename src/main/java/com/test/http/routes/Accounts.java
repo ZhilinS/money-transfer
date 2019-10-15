@@ -1,32 +1,32 @@
 package com.test.http.routes;
 
 import com.google.gson.Gson;
-import com.test.http.req.OperationReq;
+import com.test.http.req.ReqTransfer;
 import com.test.job.Job;
 import com.test.job.Reactor;
 import com.test.model.Account;
-import com.test.query.account.AccountInsert;
-import com.test.query.account.AccountSingle;
+import com.test.query.account.AccountCreate;
+import com.test.query.account.AccountOf;
 import com.test.query.account.AccountUpdate;
 import org.eclipse.jetty.http.HttpStatus;
 import spark.Route;
 
 public final class Accounts {
 
-    private final AccountSingle account;
-    private final AccountUpdate update;
-    private final AccountInsert insert;
+    private final AccountOf account;
+    private final AccountUpdate updated;
+    private final AccountCreate create;
     private final Reactor reactor;
 
     public Accounts(
-        final AccountSingle account,
-        final AccountUpdate update,
-        final AccountInsert insert,
+        final AccountOf account,
+        final AccountUpdate updated,
+        final AccountCreate create,
         final Reactor reactor
     ) {
         this.account = account;
-        this.update = update;
-        this.insert = insert;
+        this.updated = updated;
+        this.create = create;
         this.reactor = reactor;
     }
 
@@ -43,7 +43,7 @@ public final class Accounts {
 
     public Route insert() {
         return (request, response) -> {
-            this.insert.exec(
+            this.create.exec(
                 new Gson()
                     .fromJson(
                         request.body(),
@@ -57,16 +57,16 @@ public final class Accounts {
 
     public Route transfer() {
         return (request, response) -> {
-            final OperationReq req = new Gson()
+            final ReqTransfer req = new Gson()
                 .fromJson(
                     request.body(),
-                    OperationReq.class
+                    ReqTransfer.class
                 );
             this.reactor.process(
                 req,
                 new Job(
                     req,
-                    this.update,
+                    this.updated,
                     this.account
                 )
             );

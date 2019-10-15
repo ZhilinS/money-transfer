@@ -1,28 +1,28 @@
-package com.test.query;
+package com.test.query.transfer;
 
 import com.test.db.Session;
-import com.test.http.req.OperationReq;
-import com.test.model.Operation;
+import com.test.http.req.ReqTransfer;
+import com.test.model.Transfer;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
-public final class Transfer {
+public final class TransferCreate {
 
     private final Session session;
 
-    public Transfer(final Session session) {
+    public TransferCreate(final Session session) {
         this.session = session;
     }
 
     public Integer created(
-        final OperationReq req
+        final ReqTransfer req
     ) {
         return this.session.retrieve(
             ctx -> ctx.transactionResult(
                 configuration -> {
                     DSL.using(configuration)
                         .insertInto(
-                            DSL.table(DSL.name("operation"))
+                            DSL.table(DSL.name("transfer"))
                         )
                         .columns(
                             DSL.field(DSL.name("from_acc")),
@@ -34,7 +34,7 @@ public final class Transfer {
                             req.from(),
                             req.to(),
                             req.amount(),
-                            Operation.Status.PENDING
+                            Transfer.Status.PENDING
                         )
                         .execute();
                     return DSL.using(configuration)

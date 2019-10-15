@@ -5,6 +5,7 @@ import com.test.http.req.ReqDeposit;
 import com.test.http.req.ReqOperation;
 import com.test.http.req.ReqTransfer;
 import com.test.http.req.ReqWithdraw;
+import com.test.http.res.ResStatus;
 import com.test.job.Exchange;
 import com.test.job.Reactor;
 import com.test.job.SingleJob;
@@ -68,7 +69,11 @@ public final class Accounts {
                     )
             );
             response.status(HttpStatus.OK_200);
-            return response;
+            return new Gson().toJson(
+                new ResStatus(
+                    ResStatus.Status.SUCCESS
+                )
+            );
         };
     }
 
@@ -88,7 +93,11 @@ public final class Accounts {
                 )
             );
             response.status(HttpStatus.OK_200);
-            return response;
+            return new Gson().toJson(
+                new ResStatus(
+                    ResStatus.Status.SUCCESS
+                )
+            );
         };
     }
 
@@ -108,7 +117,11 @@ public final class Accounts {
                 )
             );
             response.status(HttpStatus.OK_200);
-            return response;
+            return new Gson().toJson(
+                new ResStatus(
+                    ResStatus.Status.SUCCESS
+                )
+            );
         };
     }
 
@@ -128,7 +141,11 @@ public final class Accounts {
                 )
             );
             response.status(HttpStatus.OK_200);
-            return response;
+            return new Gson().toJson(
+                new ResStatus(
+                    ResStatus.Status.SUCCESS
+                )
+            );
         };
     }
 }

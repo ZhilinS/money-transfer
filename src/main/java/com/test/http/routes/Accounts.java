@@ -14,6 +14,7 @@ import com.test.query.account.AccountCreate;
 import com.test.query.account.AccountOf;
 import com.test.query.account.AccountUpdate;
 import com.test.query.account.AccountsOf;
+import org.cactoos.list.ListOf;
 import org.eclipse.jetty.http.HttpStatus;
 import spark.Route;
 
@@ -92,10 +93,9 @@ public final class Accounts {
                     this.account
                 )
             );
-            response.status(HttpStatus.OK_200);
             return new Gson().toJson(
-                new ResStatus(
-                    ResStatus.Status.SUCCESS
+                this.account.apply(
+                    req.account()
                 )
             );
         };
@@ -116,10 +116,9 @@ public final class Accounts {
                     this.account
                 )
             );
-            response.status(HttpStatus.OK_200);
             return new Gson().toJson(
-                new ResStatus(
-                    ResStatus.Status.SUCCESS
+                this.account.apply(
+                    req.account()
                 )
             );
         };
@@ -140,10 +139,10 @@ public final class Accounts {
                     this.account
                 )
             );
-            response.status(HttpStatus.OK_200);
             return new Gson().toJson(
-                new ResStatus(
-                    ResStatus.Status.SUCCESS
+                new ListOf<>(
+                    this.account.apply(req.from()),
+                    this.account.apply(req.to())
                 )
             );
         };

@@ -27,7 +27,7 @@ public final class Reactor {
     public void process(
         final ReqOperation req,
         final Job job
-    ) {
+    ) throws Exception {
         final Integer id = this.transfer.created(req);
         this.locker.lock(req);
         try {
@@ -41,6 +41,7 @@ public final class Reactor {
                 Transfer.Status.ERROR,
                 id
             );
+            throw exception;
         } finally {
             this.locker.unlock(req);
         }

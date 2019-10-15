@@ -217,6 +217,12 @@ public class TransferTesting {
             .statusCode(HttpStatus.SC_OK);
     }
 
+    @Test
+    @Order(7)
+    public void shouldNotDropBalanceBelowZero() {
+        this.withdraw(2, 120);
+    }
+
     private void withdraw(
         final int account,
         final double amount

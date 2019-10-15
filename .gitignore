@@ -1,4 +1,4 @@
-memory:one
+memory:prod
 memory:test
 *.iml
 target

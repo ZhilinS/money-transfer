@@ -1,5 +1,6 @@
 package com.test.job;
 
+import com.test.exception.LimitsExceededException;
 import com.test.http.req.ReqOperation;
 import com.test.http.req.ReqTransfer;
 import com.test.model.Account;
@@ -37,6 +38,9 @@ public final class Exchange implements Job {
         final Account account = this.accounts.apply(
             id
         );
+        if (account.balance() + amount < 0) {
+            throw new LimitsExceededException(account, amount);
+        }
         this.update.exec(
             new Account(
                 account,

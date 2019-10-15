@@ -3,6 +3,7 @@ package com.test.http;
 import com.test.http.routes.Accounts;
 import com.test.http.routes.Transfers;
 import lombok.extern.slf4j.Slf4j;
+import spark.Spark;
 import static spark.Spark.*;
 
 @Slf4j
@@ -39,6 +40,11 @@ public final class Router {
                 get("", this.transfers.all());
                 get("/:id", this.transfers.log());
             });
+        });
+        Spark.before((req, res) -> {
+            String path = req.pathInfo();
+            if (path.endsWith("/"))
+                res.redirect(path.substring(0, path.length() - 1));
         });
     }
 }

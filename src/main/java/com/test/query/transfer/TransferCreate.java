@@ -1,7 +1,7 @@
 package com.test.query.transfer;
 
 import com.test.db.Session;
-import com.test.http.req.ReqTransfer;
+import com.test.http.req.ReqOperation;
 import com.test.model.Transfer;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
@@ -15,7 +15,7 @@ public final class TransferCreate {
     }
 
     public Integer created(
-        final ReqTransfer req
+        final ReqOperation req
     ) {
         return this.session.retrieve(
             ctx -> ctx.transactionResult(
@@ -25,15 +25,17 @@ public final class TransferCreate {
                             DSL.table(DSL.name("transfer"))
                         )
                         .columns(
-                            DSL.field(DSL.name("from_acc")),
-                            DSL.field(DSL.name("to_acc")),
+                            DSL.field(DSL.name("first")),
+                            DSL.field(DSL.name("second")),
                             DSL.field(DSL.name("amount")),
+                            DSL.field(DSL.name("type")),
                             DSL.field(DSL.name("status"))
                         )
                         .values(
                             req.from(),
                             req.to(),
                             req.amount(),
+                            req.transfer(),
                             Transfer.Status.PENDING
                         )
                         .execute();

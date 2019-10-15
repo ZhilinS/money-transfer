@@ -6,6 +6,7 @@ import com.test.db.Session;
 import com.test.http.Router;
 import com.test.http.routes.Accounts;
 import com.test.job.Locker;
+import com.test.job.LockerWrap;
 import com.test.job.Reactor;
 import com.test.query.transfer.TransferUpdate;
 import com.test.query.transfer.TransferCreate;
@@ -28,7 +29,9 @@ import org.apache.http.HttpStatus;
 import org.cactoos.io.ResourceOf;
 import org.cactoos.text.TextOf;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -49,7 +52,6 @@ public class TransferTesting {
     @BeforeAll
     public void setup() {
         connect = new Connect("jdbc:sqlite:memory:test", 1);
-        connect.init();
         final Session session = connect.session();
         new Router(
             TransferTesting.PORT,
@@ -60,15 +62,17 @@ public class TransferTesting {
                 new Reactor(
                     new TransferCreate(session),
                     new TransferUpdate(session),
-                    new Locker()
+                    new LockerWrap(
+                        new Locker()
+                    )
                 )
             )
         ).init();
     }
 
-    @Test
-    @Order(1)
+    @BeforeEach
     public void testPostAccount() throws IOException {
+        connect.init();
         new Gson()
             .fromJson(
                 new TextOf(
@@ -90,6 +94,11 @@ public class TransferTesting {
             );
     }
 
+    @AfterEach
+    public void clean() {
+        connect.clean();
+    }
+
     @Test
     @Order(2)
     public void testGetAccount() {
@@ -104,39 +113,39 @@ public class TransferTesting {
             .statusCode(HttpStatus.SC_OK);
     }
 
-    //    @Test
+    @Test
     @Order(3)
     public void testWithdraw() {
         given()
-            .body("{\"amount\": 12.3}")
+            .body("{\"account\": 3, \"amount\": 12.3}")
             .when()
             .port(TransferTesting.PORT)
-            .post("/api/account/withdraw/3");
+            .post("/api/account/withdraw");
         given()
             .when()
             .port(TransferTesting.PORT)
             .get("/api/account/3")
             .then()
             .assertThat()
-            .body("balance", equalTo(87.7))
+            .body("balance", equalTo(87.7f))
             .statusCode(HttpStatus.SC_OK);
     }
 
-    //    @Test
+    @Test
     @Order(4)
     public void testDeposit() {
         given()
-            .body("{\"amount\": 12.3}")
+            .body("{\"account\": 3, \"amount\": 12.3}")
             .when()
             .port(TransferTesting.PORT)
-            .post("/api/account/deposit/3");
+            .post("/api/account/deposit");
         given()
             .when()
             .port(TransferTesting.PORT)
             .get("/api/account/3")
             .then()
             .assertThat()
-            .body("balance", equalTo(100.0))
+            .body("balance", equalTo(112.3f))
             .statusCode(HttpStatus.SC_OK);
     }
 
@@ -192,8 +201,9 @@ public class TransferTesting {
             .statusCode(HttpStatus.SC_OK);
     }
 
-    @AfterAll
-    public void clean() {
-        connect.clean();
+    @Test
+    @Order(6)
+    public void testTransactionsLog() {
+
     }
 }

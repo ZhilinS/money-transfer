@@ -1,5 +1,6 @@
 package com.test.job;
 
+import com.test.http.req.ReqOperation;
 import com.test.http.req.ReqTransfer;
 import com.test.model.Transfer;
 import com.test.query.transfer.TransferCreate;
@@ -11,12 +12,12 @@ public final class Reactor {
 
     private final TransferCreate transfer;
     private final TransferUpdate update;
-    private final Locker locker;
+    private final LockerWrap locker;
 
     public Reactor(
         final TransferCreate transfer,
         final TransferUpdate update,
-        final Locker locker
+        final LockerWrap locker
     ) {
         this.transfer = transfer;
         this.update = update;
@@ -24,7 +25,7 @@ public final class Reactor {
     }
 
     public void process(
-        final ReqTransfer req,
+        final ReqOperation req,
         final Job job
     ) {
         final Integer id = this.transfer.created(req);

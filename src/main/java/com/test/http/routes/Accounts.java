@@ -1,9 +1,13 @@
 package com.test.http.routes;
 
 import com.google.gson.Gson;
+import com.test.http.req.ReqDeposit;
+import com.test.http.req.ReqOperation;
 import com.test.http.req.ReqTransfer;
-import com.test.job.Job;
+import com.test.http.req.ReqWithdraw;
+import com.test.job.Exchange;
 import com.test.job.Reactor;
+import com.test.job.SingleJob;
 import com.test.model.Account;
 import com.test.query.account.AccountCreate;
 import com.test.query.account.AccountOf;
@@ -55,16 +59,56 @@ public final class Accounts {
         };
     }
 
+    public Route withdraw() {
+        return (request, response) -> {
+            final ReqOperation req = new Gson()
+                .fromJson(
+                    request.body(),
+                    ReqWithdraw.class
+                );
+            this.reactor.process(
+                req,
+                new SingleJob(
+                    req,
+                    this.updated,
+                    this.account
+                )
+            );
+            response.status(HttpStatus.OK_200);
+            return response;
+        };
+    }
+
+    public Route deposit() {
+        return (request, response) -> {
+            final ReqOperation req = new Gson()
+                .fromJson(
+                    request.body(),
+                    ReqDeposit.class
+                );
+            this.reactor.process(
+                req,
+                new SingleJob(
+                    req,
+                    this.updated,
+                    this.account
+                )
+            );
+            response.status(HttpStatus.OK_200);
+            return response;
+        };
+    }
+
     public Route transfer() {
         return (request, response) -> {
-            final ReqTransfer req = new Gson()
+            final ReqOperation req = new Gson()
                 .fromJson(
                     request.body(),
                     ReqTransfer.class
                 );
             this.reactor.process(
                 req,
-                new Job(
+                new Exchange(
                     req,
                     this.updated,
                     this.account

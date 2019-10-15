@@ -3,22 +3,25 @@ package com.test.model;
 public class Transfer {
 
     private final int id;
-    private final Account fromAcc;
-    private final Account toAcc;
+    private final Account first;
+    private final Account second;
     private final double amount;
+    private final Type type;
     private final Status status;
 
     public Transfer(
         final int id,
-        final Account fromAcc,
-        final Account toAcc,
+        final Account first,
+        final Account second,
         final double amount,
+        final Type type,
         final Status status
     ) {
         this.id = id;
-        this.fromAcc = fromAcc;
-        this.toAcc = toAcc;
+        this.first = first;
+        this.second = second;
         this.amount = amount;
+        this.type = type;
         this.status = status;
     }
 
@@ -30,6 +33,10 @@ public class Transfer {
         return this.amount;
     }
 
+    public Type type() {
+        return this.type;
+    }
+
     public Status status() {
         return this.status;
     }
@@ -38,5 +45,11 @@ public class Transfer {
         PENDING,
         ERROR,
         COMPLETED
+    }
+
+    public enum Type {
+        WITHDRAW,
+        DEPOSIT,
+        TRANSFER
     }
 }

@@ -2,35 +2,32 @@ package com.test.http.req;
 
 import com.test.model.Transfer;
 
-public class ReqTransfer implements ReqOperation {
+public class ReqDeposit implements ReqOperation {
 
-    private final Integer from;
-    private final Integer to;
+    private final Integer account;
     private final double amount;
 
-    public ReqTransfer(
-        final Integer from,
-        final Integer to,
+    public ReqDeposit(
+        final Integer account,
         final double amount
     ) {
-        this.from = from;
-        this.to = to;
+        this.account = account;
         this.amount = amount;
     }
 
     @Override
     public Integer account() {
-        return null;
+        return this.account;
     }
 
     @Override
     public Integer from() {
-        return this.from;
+        return null;
     }
 
     @Override
     public Integer to() {
-        return this.to;
+        return this.account;
     }
 
     @Override
@@ -40,11 +37,11 @@ public class ReqTransfer implements ReqOperation {
 
     @Override
     public Type type() {
-        return Type.MULTIPLE;
+        return Type.SINGLE;
     }
 
     @Override
     public Transfer.Type transfer() {
-        return Transfer.Type.TRANSFER;
+        return Transfer.Type.DEPOSIT;
     }
 }

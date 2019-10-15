@@ -7,10 +7,11 @@ CREATE TABLE IF NOT EXISTS account
 CREATE TABLE transfer
 (
     id       INTEGER PRIMARY KEY AUTOINCREMENT,
-    from_acc INTEGER,
-    to_acc   INTEGER,
+    first    INTEGER,
+    second   INTEGER,
     amount   DOUBLE,
+    type     TEXT,
     status   TEXT,
-    FOREIGN KEY (from_acc) REFERENCES account (id),
-    FOREIGN KEY (to_acc) REFERENCES account (id)
+    FOREIGN KEY (first)  REFERENCES account (id),
+    FOREIGN KEY (second) REFERENCES account (id)
 );

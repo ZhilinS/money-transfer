@@ -5,6 +5,7 @@ import com.test.db.Session;
 import com.test.http.Router;
 import com.test.http.routes.Accounts;
 import com.test.job.Locker;
+import com.test.job.LockerWrap;
 import com.test.job.Reactor;
 import com.test.query.transfer.TransferUpdate;
 import com.test.query.transfer.TransferCreate;
@@ -29,7 +30,9 @@ public class Application {
                 new Reactor(
                     new TransferCreate(session),
                     new TransferUpdate(session),
-                    new Locker()
+                    new LockerWrap(
+                        new Locker()
+                    )
                 )
             )
         ).init();

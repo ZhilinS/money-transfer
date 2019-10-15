@@ -24,8 +24,8 @@ public final class Router {
             path("/account", () -> {
                 get("/:id", this.accounts.single());
                 post("", this.accounts.insert());
-//                post("/withdraw/:id", this.accounts.withdraw());
-//                post("/deposit/:id", this.accounts.deposit());
+                post("/withdraw", this.accounts.withdraw());
+                post("/deposit", this.accounts.deposit());
             });
             path("/transfer", () -> {
                 post("", this.accounts.transfer());

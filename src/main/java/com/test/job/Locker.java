@@ -27,25 +27,17 @@ public final class Locker {
         this.requests = requests;
     }
 
-    public void lock(final ReqTransfer req) {
-        if (req.from() < req.to()) {
-            this.ordered(req.from(), req.to());
-        } else {
-            this.ordered(req.to(), req.from());
-        }
+    public void lock(final int id) {
+        this.lockSingle(id);
     }
 
-    public void unlock(final ReqTransfer req) {
-        this.requests.get(req.from()).unlock();
-        this.requests.get(req.to()).unlock();
+    public void unlock(final int id) {
+        this.requests.get(id).unlock();
     }
 
-    private void ordered(final int from, final int to) {
-        final Lock first = this.locks.get(from);
-        final Lock second = this.locks.get(to);
-        this.requests.putIfAbsent(from, first);
-        this.requests.putIfAbsent(to, second);
-        first.lock();
-        second.lock();
+    private void lockSingle(final int id) {
+        final Lock lock = this.locks.get(id);
+        this.requests.putIfAbsent(id, lock);
+        lock.lock();
     }
 }

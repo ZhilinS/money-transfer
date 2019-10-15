@@ -1,20 +1,21 @@
 package com.test.db;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import java.util.Properties;
 import org.flywaydb.core.Flyway;
-import org.sqlite.SQLiteDataSource;
 
 public final class Connect {
 
-    private static final List<Session> SESSIONS = new ArrayList<>(1);
-
     private final String url;
+    private final Integer pool;
 
     public Connect(
-        final String url
+        final String url,
+        final Integer pool
     ) {
         this.url = url;
+        this.pool = pool;
     }
 
     public void init() {
@@ -25,15 +26,14 @@ public final class Connect {
     }
 
     public Session session() {
-        if (Connect.SESSIONS.isEmpty()) {
-            final SQLiteDataSource source = new SQLiteDataSource();
-            source.setUrl(this.url);
-            final Session session = new Session(source);
-            Connect.SESSIONS.add(session);
-            return session;
-        } else {
-            return Connect.SESSIONS.get(0);
-        }
+        final Properties props = new Properties();
+        props.setProperty("jdbcUrl", this.url);
+        props.setProperty("maximumPoolSize", String.valueOf(this.pool));
+        return new Session(
+            new HikariDataSource(
+                new HikariConfig(props)
+            )
+        );
     }
 
     public void clean() {

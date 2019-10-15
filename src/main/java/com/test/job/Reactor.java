@@ -3,8 +3,8 @@ package com.test.job;
 import com.google.common.util.concurrent.Striped;
 import com.test.http.req.OperationReq;
 import com.test.model.Operation;
-import com.test.query.Transfer;
 import com.test.query.OperationUpdate;
+import com.test.query.Transfer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import lombok.extern.slf4j.Slf4j;
@@ -16,27 +16,33 @@ public final class Reactor {
     private final static ConcurrentHashMap<Integer, Lock> REQUEST_LOCKS =
         new ConcurrentHashMap<>(10);
 
-    private final OperationUpdate operation;
     private final Transfer transfer;
+    private final OperationUpdate update;
 
     public Reactor(
-        final OperationUpdate operation,
-        final Transfer transfer
+        final Transfer transfer,
+        final OperationUpdate update
     ) {
-        this.operation = operation;
         this.transfer = transfer;
+        this.update = update;
     }
 
     public void process(
         final OperationReq req,
-        final TransactionJob job
+        final Job job
     ) {
+        final Integer transaction = this.transfer.created(req);
         this.lock(req);
         try {
-            job.start(
-                () -> this.transfer.created(req),
-                id -> this.operation.exec(Operation.Status.COMPLETED, id),
-                id -> this.operation.exec(Operation.Status.ERROR, id)
+            job.start();
+            this.update.exec(
+                Operation.Status.COMPLETED,
+                transaction
+            );
+        } catch (final Exception exception) {
+            this.update.exec(
+                Operation.Status.ERROR,
+                transaction
             );
         } finally {
             this.unlock(req);
@@ -51,7 +57,7 @@ public final class Reactor {
         }
     }
 
-    private void ordered(final int from , final int to) {
+    private void ordered(final int from, final int to) {
         final Lock first = Reactor.LOCKS.get(from);
         final Lock second = Reactor.LOCKS.get(to);
         Reactor.REQUEST_LOCKS.putIfAbsent(from, first);

@@ -14,6 +14,13 @@ public class Account {
     }
 
     public Account(
+        final Account old,
+        final double balance
+    ) {
+        this(old.id(), old.name(), balance);
+    }
+
+    public Account(
         final int id,
         final String name,
         final double balance

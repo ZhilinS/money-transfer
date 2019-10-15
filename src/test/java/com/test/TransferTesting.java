@@ -6,11 +6,11 @@ import com.test.db.Session;
 import com.test.http.Router;
 import com.test.http.routes.Accounts;
 import com.test.job.Reactor;
+import com.test.query.OperationUpdate;
+import com.test.query.Transfer;
 import com.test.query.account.AccountInsert;
 import com.test.query.account.AccountSingle;
 import com.test.query.account.AccountUpdate;
-import com.test.query.Transfer;
-import com.test.query.OperationUpdate;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -47,18 +47,18 @@ public class TransferTesting {
 
     @BeforeAll
     public void setup() {
-        connect = new Connect("jdbc:sqlite:memory:test");
+        connect = new Connect("jdbc:sqlite:memory:test", 1);
         connect.init();
         final Session session = connect.session();
         new Router(
             TransferTesting.PORT,
             new Accounts(
                 new AccountSingle(session),
-                new AccountInsert(session),
                 new AccountUpdate(session),
+                new AccountInsert(session),
                 new Reactor(
-                    new OperationUpdate(session),
-                    new Transfer(session)
+                    new Transfer(session),
+                    new OperationUpdate(session)
                 )
             )
         ).init();
@@ -171,7 +171,7 @@ public class TransferTesting {
         final List<? extends Future<?>> futures = tasks.stream()
             .map(pool::submit)
             .collect(Collectors.toList());
-        for (Future future:futures) {
+        for (Future future : futures) {
             future.get();
         }
         given()

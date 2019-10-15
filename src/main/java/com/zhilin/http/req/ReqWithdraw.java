@@ -5,11 +5,11 @@ import com.zhilin.model.Transfer;
 public class ReqWithdraw implements ReqOperation {
 
     private final Integer account;
-    private final double amount;
+    private final float amount;
 
     public ReqWithdraw(
         final Integer account,
-        final double amount
+        final float amount
     ) {
         this.account = account;
         this.amount = amount;
@@ -31,7 +31,7 @@ public class ReqWithdraw implements ReqOperation {
     }
 
     @Override
-    public double amount() {
+    public float amount() {
         return -this.amount;
     }
 

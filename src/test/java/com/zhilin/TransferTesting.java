@@ -141,14 +141,14 @@ public class TransferTesting {
     @Test
     @Order(3)
     public void testWithdraw() {
-        this.withdraw(3, 12.3);
+        this.withdraw(3, 12.3f);
         this.balance(3, 87.7f);
     }
 
     @Test
     @Order(4)
     public void testDeposit() {
-        this.deposit(3, 12.3);
+        this.deposit(3, 12.3f);
         this.balance(3, 112.3F);
     }
 
@@ -225,7 +225,7 @@ public class TransferTesting {
 
     private void withdraw(
         final int account,
-        final double amount
+        final float amount
     ) {
         given()
             .body(
@@ -240,7 +240,7 @@ public class TransferTesting {
 
     private void deposit(
         final int account,
-        final double amount
+        final float amount
     ) {
         given()
             .body(
@@ -256,7 +256,7 @@ public class TransferTesting {
     private void transfer(
         final int from,
         final int to,
-        final double amount
+        final float amount
     ) {
         given()
             .body(
@@ -271,7 +271,7 @@ public class TransferTesting {
 
     private void balance(
         final int account,
-        final double balance
+        final float balance
     ) {
         given()
             .when()

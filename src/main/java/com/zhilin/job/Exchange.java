@@ -32,7 +32,7 @@ public final class Exchange implements Job {
 
     private void change(
         final int id,
-        final double amount
+        final float amount
     ) throws Exception {
         final Account account = this.accounts.apply(
             id

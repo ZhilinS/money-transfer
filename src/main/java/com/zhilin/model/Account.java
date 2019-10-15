@@ -4,18 +4,18 @@ public class Account {
 
     private final int id;
     private final String name;
-    private final double balance;
+    private final float balance;
 
     public Account(
         final String name,
-        final double balance
+        final float balance
     ) {
         this(0, name, balance);
     }
 
     public Account(
         final Account old,
-        final double balance
+        final float balance
     ) {
         this(old.id(), old.name(), balance);
     }
@@ -23,7 +23,7 @@ public class Account {
     public Account(
         final int id,
         final String name,
-        final double balance
+        final float balance
     ) {
         this.id = id;
         this.name = name;
@@ -38,7 +38,7 @@ public class Account {
         return this.name;
     }
 
-    public double balance() {
+    public float balance() {
         return this.balance;
     }
 }

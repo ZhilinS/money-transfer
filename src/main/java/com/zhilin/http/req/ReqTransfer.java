@@ -6,12 +6,12 @@ public class ReqTransfer implements ReqOperation {
 
     private final Integer from;
     private final Integer to;
-    private final double amount;
+    private final float amount;
 
     public ReqTransfer(
         final Integer from,
         final Integer to,
-        final double amount
+        final float amount
     ) {
         this.from = from;
         this.to = to;
@@ -34,7 +34,7 @@ public class ReqTransfer implements ReqOperation {
     }
 
     @Override
-    public double amount() {
+    public float amount() {
         return this.amount;
     }
 

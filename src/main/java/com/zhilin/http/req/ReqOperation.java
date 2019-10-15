@@ -10,7 +10,7 @@ public interface ReqOperation {
 
     Integer to();
 
-    double amount();
+    float amount();
 
     Type type();
 

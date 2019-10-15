@@ -21,10 +21,13 @@ POST /api/account/          - creates new account
 body: {"name": "String", "balance": int}
 
 POST /api/account/withdraw  - withdraws money from account
-body: {"account": int, "amount": double}
+body: {"account": int, "amount": float}
 
 POST /api/account/deposit   - deposits money to account
-body: {"account": int, "amount": double}
+body: {"account": int, "amount": float}
 ```
 
 Uses in-memory SQLite db separated for testing and production purposes. 
+
+Floats used widely because there is a problem mapping
+from FLOAT SQLite type to java double.

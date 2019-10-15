@@ -5,7 +5,7 @@ public class Transfer {
     private final int id;
     private final Integer first;
     private final Integer second;
-    private final double amount;
+    private final float amount;
     private final Type type;
     private final Status status;
 
@@ -13,7 +13,7 @@ public class Transfer {
         final int id,
         final Integer first,
         final Integer second,
-        final double amount,
+        final float amount,
         final Type type,
         final Status status
     ) {
@@ -29,7 +29,7 @@ public class Transfer {
         return this.id;
     }
 
-    public double amount() {
+    public float amount() {
         return this.amount;
     }
 

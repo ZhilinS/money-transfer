@@ -5,11 +5,11 @@ import com.zhilin.model.Account;
 public class LimitsExceededException extends RuntimeException{
 
     private final Account account;
-    private final double amount;
+    private final float amount;
 
     public LimitsExceededException(
         final Account account,
-        final double amount
+        final float amount
     ) {
         super();
         this.account = account;

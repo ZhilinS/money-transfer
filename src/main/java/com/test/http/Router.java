@@ -1,6 +1,7 @@
 package com.test.http;
 
 import com.test.http.routes.Accounts;
+import com.test.http.routes.Transfers;
 import lombok.extern.slf4j.Slf4j;
 import static spark.Spark.*;
 
@@ -9,13 +10,16 @@ public final class Router {
 
     private final int port;
     private final Accounts accounts;
+    private final Transfers transfers;
 
     public Router(
         final int port,
-        final Accounts accounts
+        final Accounts accounts,
+        final Transfers transfers
     ) {
         this.port = port;
         this.accounts = accounts;
+        this.transfers = transfers;
     }
 
     public void init() {
@@ -29,6 +33,10 @@ public final class Router {
             });
             path("/transfer", () -> {
                 post("", this.accounts.transfer());
+            });
+            path("/log", () -> {
+                get("", this.transfers.all());
+                get("/:id", this.transfers.log());
             });
         });
     }

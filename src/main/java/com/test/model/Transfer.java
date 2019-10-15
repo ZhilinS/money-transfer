@@ -3,16 +3,16 @@ package com.test.model;
 public class Transfer {
 
     private final int id;
-    private final Account first;
-    private final Account second;
+    private final Integer first;
+    private final Integer second;
     private final double amount;
     private final Type type;
     private final Status status;
 
     public Transfer(
         final int id,
-        final Account first,
-        final Account second,
+        final Integer first,
+        final Integer second,
         final double amount,
         final Type type,
         final Status status

@@ -4,15 +4,21 @@ import com.google.gson.Gson;
 import com.test.db.Connect;
 import com.test.db.Session;
 import com.test.http.Router;
+import com.test.http.req.ReqDeposit;
+import com.test.http.req.ReqTransfer;
+import com.test.http.req.ReqWithdraw;
 import com.test.http.routes.Accounts;
+import com.test.http.routes.Transfers;
 import com.test.job.Locker;
 import com.test.job.LockerWrap;
 import com.test.job.Reactor;
-import com.test.query.transfer.TransferUpdate;
-import com.test.query.transfer.TransferCreate;
 import com.test.query.account.AccountCreate;
 import com.test.query.account.AccountOf;
 import com.test.query.account.AccountUpdate;
+import com.test.query.transfer.TransferCreate;
+import com.test.query.transfer.TransferOf;
+import com.test.query.transfer.TransferUpdate;
+import com.test.query.transfer.TransfersOf;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -28,7 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.cactoos.io.ResourceOf;
 import org.cactoos.text.TextOf;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +44,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
 @Slf4j
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -66,6 +72,10 @@ public class TransferTesting {
                         new Locker()
                     )
                 )
+            ),
+            new Transfers(
+                new TransferOf(session),
+                new TransfersOf(session)
             )
         ).init();
     }
@@ -116,37 +126,15 @@ public class TransferTesting {
     @Test
     @Order(3)
     public void testWithdraw() {
-        given()
-            .body("{\"account\": 3, \"amount\": 12.3}")
-            .when()
-            .port(TransferTesting.PORT)
-            .post("/api/account/withdraw");
-        given()
-            .when()
-            .port(TransferTesting.PORT)
-            .get("/api/account/3")
-            .then()
-            .assertThat()
-            .body("balance", equalTo(87.7f))
-            .statusCode(HttpStatus.SC_OK);
+        this.withdraw(3, 12.3);
+        this.balance(3, 87.7f);
     }
 
     @Test
     @Order(4)
     public void testDeposit() {
-        given()
-            .body("{\"account\": 3, \"amount\": 12.3}")
-            .when()
-            .port(TransferTesting.PORT)
-            .post("/api/account/deposit");
-        given()
-            .when()
-            .port(TransferTesting.PORT)
-            .get("/api/account/3")
-            .then()
-            .assertThat()
-            .body("balance", equalTo(112.3f))
-            .statusCode(HttpStatus.SC_OK);
+        this.deposit(3, 12.3);
+        this.balance(3, 112.3F);
     }
 
     @Test
@@ -158,22 +146,14 @@ public class TransferTesting {
             .boxed()
             .forEach(i -> tasks.add(
                 new Thread(
-                    () -> given()
-                        .body("{\"from\": 3, \"to\": 2, \"amount\": 1}")
-                        .when()
-                        .port(TransferTesting.PORT)
-                        .post("/api/transfer")
+                    () -> this.transfer(3, 2, 1)
                 )
             ));
         IntStream.rangeClosed(100, 199)
             .boxed()
             .forEach(i -> tasks.add(
                 new Thread(
-                    () -> given()
-                        .body("{\"from\": 2, \"to\": 3, \"amount\": 1}")
-                        .when()
-                        .port(TransferTesting.PORT)
-                        .post("/api/transfer")
+                    () -> this.transfer(2, 3, 1)
                 )
             ));
         Collections.shuffle(tasks);
@@ -183,27 +163,107 @@ public class TransferTesting {
         for (Future future : futures) {
             future.get();
         }
-        given()
-            .when()
-            .port(TransferTesting.PORT)
-            .get("/api/account/3")
-            .then()
-            .assertThat()
-            .body("balance", equalTo(100.0f))
-            .statusCode(HttpStatus.SC_OK);
-        given()
-            .when()
-            .port(TransferTesting.PORT)
-            .get("/api/account/2")
-            .then()
-            .assertThat()
-            .body("balance", equalTo(112.3f))
-            .statusCode(HttpStatus.SC_OK);
+        this.balance(3, 100.0f);
+        this.balance(2, 112.3f);
     }
 
     @Test
     @Order(6)
     public void testTransactionsLog() {
+        this.withdraw(4, 32.1f);
+        this.deposit(1, 413.98f);
+        given()
+            .when()
+            .port(TransferTesting.PORT)
+            .get("/api/log/4")
+            .then()
+            .assertThat()
+            .body("type", equalTo("WITHDRAW"))
+            .body("status", equalTo("COMPLETED"))
+            .body("id", equalTo(4))
+            .statusCode(HttpStatus.SC_OK);
+        given()
+            .when()
+            .port(TransferTesting.PORT)
+            .get("/api/log/4")
+            .then()
+            .assertThat()
+            .body("type", equalTo("DEPOSIT"))
+            .body("status", equalTo("COMPLETED"))
+            .body("id", equalTo(1))
+            .statusCode(HttpStatus.SC_OK);
+        given()
+            .when()
+            .port(TransferTesting.PORT)
+            .get("/api/log")
+            .then()
+            .assertThat()
+            .body("size()", is(2))
+            .statusCode(HttpStatus.SC_OK);
+    }
 
+    private void withdraw(
+        final int account,
+        final double amount
+    ) {
+        given()
+            .body(
+                new Gson().toJson(
+                    new ReqWithdraw(account, amount)
+                )
+            )
+            .when()
+            .port(TransferTesting.PORT)
+            .post("/api/account/withdraw");
+    }
+
+    private void deposit(
+        final int account,
+        final double amount
+    ) {
+        given()
+            .body(
+                new Gson().toJson(
+                    new ReqDeposit(account, amount)
+                )
+            )
+            .when()
+            .port(TransferTesting.PORT)
+            .post("/api/account/deposit");
+    }
+
+    private void transfer(
+        final int from,
+        final int to,
+        final double amount
+    ) {
+        given()
+            .body(
+                new Gson().toJson(
+                    new ReqTransfer(from, to, amount)
+                )
+            )
+            .when()
+            .port(TransferTesting.PORT)
+            .post("/api/transfer");
+    }
+
+    private void balance(
+        final int account,
+        final float balance
+    ) {
+        given()
+            .when()
+            .port(TransferTesting.PORT)
+            .get(
+                String.format(
+                    "/api/account/%d",
+                    account
+                )
+            )
+            .then()
+            .assertThat()
+            .body("balance", equalTo(balance))
+            .statusCode(HttpStatus.SC_OK);
     }
 }

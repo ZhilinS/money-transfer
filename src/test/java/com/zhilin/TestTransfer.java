@@ -20,6 +20,7 @@ import com.zhilin.query.transfer.TransferCreate;
 import com.zhilin.query.transfer.TransferOf;
 import com.zhilin.query.transfer.TransferUpdate;
 import com.zhilin.query.transfer.TransfersOf;
+import io.restassured.response.Response;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -44,13 +45,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 @Slf4j
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class TransferTesting {
+public class TestTransfer {
 
     private final static int PORT = 8081;
 
@@ -61,7 +61,7 @@ public class TransferTesting {
         connect = new Connect("jdbc:sqlite:memory:test", 1);
         final Session session = connect.session();
         new Router(
-            TransferTesting.PORT,
+            TestTransfer.PORT,
             new Accounts(
                 new AccountOf(session),
                 new AccountsOf(session),
@@ -98,7 +98,7 @@ public class TransferTesting {
                 acc -> given()
                     .body(new Gson().toJson(acc))
                     .when()
-                    .port(TransferTesting.PORT)
+                    .port(TestTransfer.PORT)
                     .post("/api/account")
                     .then()
                     .assertThat()
@@ -116,7 +116,7 @@ public class TransferTesting {
     public void testGetAccountsList() {
         given()
             .when()
-            .port(TransferTesting.PORT)
+            .port(TestTransfer.PORT)
             .get("/api/account")
             .then()
             .assertThat()
@@ -129,7 +129,7 @@ public class TransferTesting {
     public void testGetAccount() {
         given()
             .when()
-            .port(TransferTesting.PORT)
+            .port(TestTransfer.PORT)
             .get("/api/account/1")
             .then()
             .assertThat()
@@ -189,27 +189,27 @@ public class TransferTesting {
         this.deposit(1, 413.98f);
         given()
             .when()
-            .port(TransferTesting.PORT)
+            .port(TestTransfer.PORT)
             .get("/api/log/4")
             .then()
             .assertThat()
-            .body("type", equalTo("WITHDRAW"))
-            .body("status", equalTo("COMPLETED"))
-            .body("first", equalTo(4))
+            .body("type", hasItem("WITHDRAW"))
+            .body("status", hasItem("COMPLETED"))
+            .body("first", hasItem(4))
             .statusCode(HttpStatus.SC_OK);
         given()
             .when()
-            .port(TransferTesting.PORT)
+            .port(TestTransfer.PORT)
             .get("/api/log/1")
             .then()
             .assertThat()
-            .body("type", equalTo("DEPOSIT"))
-            .body("status", equalTo("COMPLETED"))
-            .body("second", equalTo(1))
+            .body("type", hasItem("DEPOSIT"))
+            .body("status", hasItem("COMPLETED"))
+            .body("second", hasItem(1))
             .statusCode(HttpStatus.SC_OK);
         given()
             .when()
-            .port(TransferTesting.PORT)
+            .port(TestTransfer.PORT)
             .get("/api/log")
             .then()
             .assertThat()
@@ -220,36 +220,39 @@ public class TransferTesting {
     @Test
     @Order(7)
     public void shouldNotDropBalanceBelowZero() {
-        this.withdraw(2, 120);
+        this.withdraw(2, 120)
+            .then()
+            .assertThat()
+            .statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
     }
 
-    private void withdraw(
+    private Response withdraw(
         final int account,
         final float amount
     ) {
-        given()
+        return given()
             .body(
                 new Gson().toJson(
                     new ReqWithdraw(account, amount)
                 )
             )
             .when()
-            .port(TransferTesting.PORT)
+            .port(TestTransfer.PORT)
             .post("/api/account/withdraw");
     }
 
-    private void deposit(
+    private Response deposit(
         final int account,
         final float amount
     ) {
-        given()
+        return given()
             .body(
                 new Gson().toJson(
                     new ReqDeposit(account, amount)
                 )
             )
             .when()
-            .port(TransferTesting.PORT)
+            .port(TestTransfer.PORT)
             .post("/api/account/deposit");
     }
 
@@ -265,7 +268,7 @@ public class TransferTesting {
                 )
             )
             .when()
-            .port(TransferTesting.PORT)
+            .port(TestTransfer.PORT)
             .post("/api/transfer");
     }
 
@@ -275,7 +278,7 @@ public class TransferTesting {
     ) {
         given()
             .when()
-            .port(TransferTesting.PORT)
+            .port(TestTransfer.PORT)
             .get(
                 String.format(
                     "/api/account/%d",

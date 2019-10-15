@@ -31,3 +31,12 @@ Uses in-memory SQLite db separated for testing and production purposes.
 
 Floats used widely because there is a problem mapping
 from FLOAT SQLite type to java double.
+
+
+### Testing
+Tests are running on top of their own web server and db instance.
+
+To run tests simply put this in console (from project root):
+```
+mvn clean test
+```

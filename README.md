@@ -1,8 +1,16 @@
 # Simple money transfer system
 
+This is a simple system, used for transferring money between accounts, withdraw and deposit, backed by
+* [Spark Framework](http://sparkjava.com) for REST interaction
+* [JOOQ](https://www.jooq.org) for DB work
+* [Google Guava](https://github.com/google/guava) for locking mechanism
+* [Cactoos](https://www.cactoos.org) for OOP-style programming
+* [SQLite](https://www.sqlite.org/index.html) as simpliest possible DB engine
 
-To run app from cli you'll need `java` at least 1.8, `maven` 3.5.0.
+### Prerequisites
+To run the app from cli you'll need `java` at least 1.8, `maven` 3.5.0.
 
+### Running
 To start server, put this in cli from the project root: 
 ```
 mvn clean package && java -jar target/target/transfer-1.0-jar-with-dependencies.jar
